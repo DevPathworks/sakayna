@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sakay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/Style.css">
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJiHQNcjxKtLV0FV6rKVKKwdRLIZicv1U&callback=initMap"
+        async defer></script>
+</head>
+
+<body>
+    <div class="Sakay_head text-center">
+        <img src="./assets/images/sakay.png" alt="">
+        <h1>Delivery Form</h1>
+        <p><em><mark>Note: Please message us <a href="https://m.me/sakayna.main" target="_blank">MESSENGER</a> for
+                    questions</mark></em></p>
+        <p>We are Open 7:30AM - 8:30PM Daily</p>
+        <p><em><mark>For Custom Rates, message us.</mark></em></p>
+    </div>
+    <div class="container">
+        <div class="form_div">
+            <form class="form_main p-5" id="deliveryForm">
+                <!-- Delivery Name -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                    <input type="text" id="name" class="form-control" placeholder="ex. John Doe" required>
+                </div>
+                <!-- Delivery Phone -->
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Delivery No <span class="text-danger">*</span></label>
+                    <input type="text" id="phone" class="form-control" placeholder="09123456789" required>
+                </div>
+
+                <!-- Delivery Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email (optional)</label>
+                    <input type="text" id="email" class="form-control" placeholder="example@gmail.com">
+                </div>
+
+                <!-- Delivery Address -->
+                <div class="mb-3">
+                    <label for="deliveryaddress" class="form-label">Delivery Address <span
+                            class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="deliveryaddress" class="form-control"
+                            placeholder="Purok, Street, Barangay, City, Landmark" required>
+                        <button type="button" class="btn btn-outline-secondary" id="viewDeliveryMap">View Map</button>
+                    </div>
+                </div>
+
+                <!--Pickup From-->
+                <div class="mb-3">
+                    <label for="disabledTextInput" class="form-label">Pick up from <span class="span_text">*</label>
+                    <input type="text" id="pickup" class="form-control" placeholder="John Doe / Store Name">
+                </div>
+
+                <!-- Pick Up Address -->
+                <div class="mb-3">
+                    <label for="pickupaddress" class="form-label">Pick Up Address <span
+                            class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="pickupaddress" class="form-control"
+                            placeholder="Street, Barangay, City, Landmark" required>
+                        <button type="button" class="btn btn-outline-secondary" id="viewPickupMap">View Map</button>
+                    </div>
+
+                    <!-- Pick up Number -->
+                    <div class="mb-3">
+                        <label for="pickupnumber" class="form-label">Pick Up No (optional)</label>
+                        <input type="text" id="pickupnumber" class="form-control" placeholder="09123456789">
+                    </div>
+
+                </div>
+
+                <!-- Display Delivery Fee -->
+                <div class="mb-3">
+                    <p id="deliveryFee">Delivery Fee: (Php: 0.00)</p>
+                </div>
+                <!-- Delivery Details -->
+                <div class="mb-3">
+                    <label for="other" class="form-label">Other Details</label>
+                    <textarea id="other" class="form-control" style="resize: both; height: 150px;">
+                        Orders and Quantity:
+                        Requests:
+                        Time and Date:
+                        Mode of Payments:</textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" id="submit" class="btn btn-primary">Place Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Order Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Your order has been placed successfully! Your order number is: <span id="order-no"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pickup Map Modal -->
+    <div class="modal fade" id="pickupMapModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Pickup Location</h5>
+                    <button type="button" id="pickupLocateMe" class="btn btn-outline-primary">Locate Me</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="pickupMap" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Map Modal -->
+    <div class="modal fade" id="deliveryMapModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Delivery Location</h5>
+                    <button type="button" id="deliveryLocateMe" class="btn btn-outline-primary">Locate Me</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="deliveryMap" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./assets/js/Index.js"></script>
+</body>
+
+</html>
