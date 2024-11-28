@@ -1,3 +1,6 @@
+import { caculateDistance } from './google-distance.js';
+import { getSheetData } from './google-sheet.js';
+
 var UserName = "";
 var PhoneNumber = "";
 var Email = "";
@@ -50,30 +53,60 @@ function generateOrderNumber() {
 
 let GorderNumber = generateOrderNumber();
 
+let pickupAddress = "";
+let deliveryAddress = "";
+
 function updateAddress(inputId, latLng) {
     const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: latLng }, (results, status) => {
+    geocoder.geocode({ location: latLng }, async (results, status) => {
         if (status === 'OK' && results[0]) {
             document.getElementById(inputId).value = results[0].formatted_address;
             if (inputId === 'pickupaddress') {
-                // document.getElementById('pickup-latitude').value = latLng.lat();
-                // document.getElementById('pickup-longitude').value = latLng.lng();
                 pickupLatitude = latLng.lat();
-                pickupLongitude =  latLng.lng();
+                pickupLongitude = latLng.lng();
+                pickupAddress = results[0].formatted_address;
             } else if (inputId === 'deliveryaddress') {
-                // document.getElementById('delivery-latitude').value = latLng.lat();
-                // document.getElementById('delivery-longitude').value = latLng.lng();
-                deliveryLatitude = latLng.lat(); // Store latitude in variable
-                deliveryLongitude = latLng.lng(); // Store longitude in variable
+                deliveryLatitude = latLng.lat();
+                deliveryLongitude = latLng.lng();
+                deliveryAddress = results[0].formatted_address;
+            }
+
+            console.log(`pickup-lat:  ${pickupLatitude}`);
+            console.log(`pickup-lng:  ${pickupLongitude}`);
+            console.log(`delv-lat:  ${deliveryLatitude}`);
+            console.log(`delv-lng:  ${deliveryLongitude}`);
+
+            if (pickupLatitude && pickupLongitude && deliveryLatitude && deliveryLongitude) {
+                const origin = `${pickupLatitude},${pickupLongitude}`;
+                const destination = `${deliveryLatitude},${deliveryLongitude}`;
+                caculateDistance(pickupLatitude, pickupLongitude, pickupAddress, deliveryLatitude, deliveryLongitude, deliveryAddress).then(async (response) => {
+                    if (response.rows && response.rows[0] && response.rows[0].elements && response.rows[0].elements[0]) {
+                        const distance = response.rows[0].elements[0].distance.value / 1000; // Convert meters to kilometers
+                        console.log(`Distance: ${distance} km`);
+
+                        // Fetch the fare rates from Google Sheets
+                        const { baseFare, kmRate, otherCharges } = await getSheetData();
+
+                        // Calculate the delivery fee
+                        const deliveryFee = parseFloat(baseFare) + (parseFloat(kmRate) * distance) + parseFloat(otherCharges);
+                        console.log(`Delivery Fee: ${deliveryFee}`);
+
+                        // Display the delivery fee
+                        displayDeliveryFee(deliveryFee);
+                        
+                    } else {
+                        console.error('Invalid response format', response);
+                    }
+                });
             }
         } else {
             alert('Geocoder failed: ' + status);
         }
     });
-    console.log(`pickup-lat:  ${pickupLatitude}`);
-    console.log(`pickup-lng:  ${pickupLongitude}`);
-    console.log(`delv-lat:  ${deliveryLatitude}`);
-    console.log(`delv-lng:  ${deliveryLongitude}`);
+}
+
+function displayDeliveryFee(fee) {
+    document.getElementById('deliveryFee').innerText = `Delivery Fee: Php ${fee.toFixed(2)}`;
 }
 
 function CreateOrder() {
@@ -156,7 +189,7 @@ document.getElementById("submit").addEventListener("click", function (event) {
 let pickupMap, deliveryMap;
 let pickupMarker, deliveryMarker;
 
-function initMap() {
+window.initMap = function () {
     // Initialize Pickup Map
     pickupMap = new google.maps.Map(document.getElementById('pickupMap'), {
         center: { lat: 7.4472, lng: 125.8094 }, // Tagum City

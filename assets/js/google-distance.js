@@ -7,24 +7,32 @@ const API_KEY = 'AIzaSyD97nieksSgfEetrVjhJruiiAQufeRrK2Y';
 
 const deliveryFee = document.getElementById('deliveryFee');
 
-async function caculateDistance(origin, destination) {
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${API_KEY}`;
-    await fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const distance = data.rows[0].elements[0].distance.text;
-            const duration = data.rows[0].elements[0].duration.text;
-            const distanceValue = parseFloat(distance.replace(' km', '').replace(',', ''));
-            console.log(`Distance: ${distance}`);
-            console.log(`Duration: ${duration}`);
-            displayDeliveryFee(distanceValue)
-        })
-        .catch(error => console.error('Error:', error));
+export async function caculateDistance(originlat,originlang, pickupAddress, destlat, destlang, deliveryAddress) {
+
+
+    const origin1 = { lat: originlat, lng: originlang };
+    const origin2 = pickupAddress;
+    const destinationA = deliveryAddress;
+    const destinationB = { lat: destlat, lng: destlang };
+
+    let mps = {
+        origins: [origin1,origin2],
+        destinations: [destinationA,destinationB],
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+        durationInTraffic: true,
+        avoidHighways: false,
+        avoidTolls: false
+    };
+
+    var service = new google.maps.DistanceMatrixService();
+
+    return await service.getDistanceMatrix(mps);
 }
 
 function displayDeliveryFee(distance) {
     const baseFare = 5; // Base fare in your currency
     const perKmRate = 2; // Rate per km in your currency
     const fee = baseFare + (perKmRate * distance);
-    deliveryFee.innerText = `Delivery Fee: $${fee.toFixed(2)}`;
+    deliveryFee.innerText = `Delivery Fee: $${fee}`;
 }

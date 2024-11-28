@@ -27,19 +27,46 @@ async function fetchSheetData() {
         }
 
         const data = await response.json();
-        displayData(data.values);
+        return data.values;
     } catch (error) {
         console.error('Error:', error);
         document.getElementById('output').innerHTML = 'Error fetching data';
     }
 }
 
-function displayData(data) {
-    const output = document.getElementById('output');
-    if (data && data.length > 0) {
-        const html = data.map(row => row.join(', ')).join('<br>');
-        output.innerHTML = html;
-    } else {
-        output.innerHTML = 'No data found.';
+export async function getSheetData() {
+    // Extract values from the sheet
+    let result = await fetchSheetData();
+    let baseFare = 0;
+    let kmRate = 0;
+    let otherCharges = 0;
+
+    if (result) {
+        const baseFareRow = result.find(row => row[0] === 'base_fare');
+        const kmRateRow = result.find(row => row[0] === 'km_rate');
+        const otherChargesRow = result.find(row => row[0] === 'other_charges');
+
+        if (baseFareRow && baseFareRow[1]) {
+            baseFare = baseFareRow[1];
+            console.log(`Base Fare: ${baseFare}`);
+        } else {
+            console.error('Base fare not found in the data');
+        }
+
+        if (kmRateRow && kmRateRow[1]) {
+            kmRate = kmRateRow[1];
+            console.log(`KM Rate: ${kmRate}`);
+        } else {
+            console.error('KM rate not found in the data');
+        }
+
+        if (otherChargesRow && otherChargesRow[1]) {
+            otherCharges = otherChargesRow[1];
+            console.log(`Other Charges: ${otherCharges}`);
+        } else {
+            console.error('Other charges not found in the data');
+        }
     }
+
+    return { baseFare, kmRate, otherCharges };
 }

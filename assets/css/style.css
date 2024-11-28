@@ -8,8 +8,8 @@
 }
 .form_div{
     background-color: white;
-max-width: 650px;
-box-shadow: 0 3px 9px #0000001a;
+    max-width: 650px;
+    box-shadow: 0 3px 9px #0000001a;
 }
 .form-control:disabled{
     background-color: transparent !important;
@@ -31,4 +31,23 @@ box-shadow: 0 3px 9px #0000001a;
 .span_text{
     color: #D33282;
     font-size: 18px;
+}
+
+#other {
+    text-align: left;
+    min-height: 150px;
+    padding: 0;
+    resize: both;
+}
+
+#submit {
+    width: 100%;
+    height: 60px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+#submit:hover {
+    background-color: #7e80ff;
+    color: white;
 }
