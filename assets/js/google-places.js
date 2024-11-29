@@ -46,7 +46,47 @@ export const initAutocomplete = function (updateMapAndMarker) {
             longitude: place.geometry.location.lng()
         };
 
-      
+        if (activeModal === 'pickupMapModal') {
+            pickupName = placeDetails.name;
+            pickupAddress = placeDetails.address;
+            pickupLatitude = placeDetails.latitude;
+            pickupLongitude = placeDetails.longitude;
+
+            // Show selected place details
+            pickupSelectedPlaceDiv.innerHTML = `
+            <div class="selected__place__container">
+                <h4>Selected Place:</h4>
+                <p><strong>Name:</strong> ${pickupName}</p>
+                <p><strong>Address:</strong> ${pickupAddress}</p>
+                <p><strong>Coordinates:</strong> ${pickupLatitude}, ${pickupLongitude}</p>
+                <div>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+                </div>
+            </div>
+            `;
+            pickupSelectedPlaceDiv.style.display = 'block';
+        }
+
+        if (activeModal === 'deliveryMapModal') {
+            deliveryName = placeDetails.name;
+            deliveryAddress = placeDetails.address;
+            deliveryLatitude = placeDetails.latitude;
+            deliveryLongitude = placeDetails.longitude;
+
+            // Show selected place details
+            deliveirySelectedPlaceDiv.innerHTML = `
+            <div class="selected__place__container">
+                <h4>Selected Place:</h4>
+                <p><strong>Name:</strong> ${deliveryName}</p>
+                <p><strong>Address:</strong> ${deliveryAddress}</p>
+                <p><strong>Coordinates:</strong> ${deliveryLatitude}, ${deliveryLongitude}</p>
+                <div>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+                </div>
+            </div>
+            `;
+            deliveirySelectedPlaceDiv.style.display = 'block';
+        }    
         
 
         const pickUpMapId = document.getElementById('pickupMap');
