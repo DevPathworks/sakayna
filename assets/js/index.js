@@ -1,6 +1,6 @@
 import { caculateDistance } from './google-distance.js';
 import { getSheetData } from './google-sheet.js';
-import { initAutocomplete, setActiveModal } from './google-places.js';
+import { initAutocomplete, setActiveModal, clearModalContents } from './google-places.js';
 
 let UserName = "";
 let PhoneNumber = "";
@@ -31,10 +31,12 @@ document.getElementById("email").addEventListener("input", function () {
 
 document.getElementById("pickupaddress").addEventListener("input", function () {
     PickUpAddress = this.value;
+    this.disabled = false; // Ensure the field is enabled
 });
 
 document.getElementById("deliveryaddress").addEventListener("input", function () {
     DeliveryAddress = this.value;
+    this.disabled = false; // Ensure the field is enabled
 });
 
 document.getElementById("other").addEventListener("input", function () {
@@ -55,8 +57,8 @@ function generateOrderNumber() {
 
 let GorderNumber = generateOrderNumber();
 
-let pickupAddress = "";
-let deliveryAddress = "";
+// let pickupAddress = "";
+// let deliveryAddress = "";
 
 function updateAddress(inputId, latLng) {
     const geocoder = new google.maps.Geocoder();
@@ -66,11 +68,11 @@ function updateAddress(inputId, latLng) {
             if (inputId === 'pickupaddress') {
                 pickupLatitude = latLng.lat();
                 pickupLongitude = latLng.lng();
-                pickupAddress = results[0].formatted_address;
+                PickUpAddress = results[0].formatted_address;
             } else if (inputId === 'deliveryaddress') {
                 deliveryLatitude = latLng.lat();
                 deliveryLongitude = latLng.lng();
-                deliveryAddress = results[0].formatted_address;
+                DeliveryAddress = results[0].formatted_address;
             }
 
             console.log(`pickup-lat:  ${pickupLatitude}`);
@@ -79,9 +81,7 @@ function updateAddress(inputId, latLng) {
             console.log(`delv-lng:  ${deliveryLongitude}`);
 
             if (pickupLatitude && pickupLongitude && deliveryLatitude && deliveryLongitude) {
-                const origin = `${pickupLatitude},${pickupLongitude}`;
-                const destination = `${deliveryLatitude},${deliveryLongitude}`;
-                caculateDistance(pickupLatitude, pickupLongitude, pickupAddress, deliveryLatitude, deliveryLongitude, deliveryAddress).then(async (response) => {
+                caculateDistance(pickupLatitude, pickupLongitude, PickUpAddress, deliveryLatitude, deliveryLongitude, DeliveryAddress).then(async (response) => {
                     if (response.rows && response.rows[0] && response.rows[0].elements && response.rows[0].elements[0]) {
                         const distance = response.rows[0].elements[0].distance.value / 1000; // Convert meters to kilometers
                         console.log(`Distance: ${distance} km`);
@@ -164,6 +164,8 @@ function CreateOrder() {
             DeliveryAddress = "";
             Other = "";
             PickUpNumber = "";
+            clearModalContents();
+            document.getElementById('deliveryFee').innerText = `Delivery Fee: (Php: 0.00)`;
         })
         .catch(error => {
             console.error('Error:', error);
@@ -210,7 +212,6 @@ function updateMapAndMarker(map, marker, place, inputId) {
 
 window.initMap = function () {
     initAutocomplete(updateMapAndMarker);
-    
     // Initialize Pickup Map
     pickupMap = new google.maps.Map(document.getElementById('pickupMap'), {
         center: { lat: 7.4472, lng: 125.8094 }, // Tagum City
@@ -266,6 +267,43 @@ function locateUser(map, marker) {
     }
 }
 
+function resetMap() {
+     // Initialize Pickup Map
+     pickupMap = new google.maps.Map(document.getElementById('pickupMap'), {
+        center: { lat: 7.4472, lng: 125.8094 }, // Tagum City
+        zoom: 12,
+    });
+
+    pickupMarker = new google.maps.Marker({
+        map: pickupMap,
+        draggable: true,
+        position: { lat: 7.4472, lng: 125.8094 },
+    });
+
+    google.maps.event.addListener(pickupMap, 'click', (event) => {
+        pickupMarker.setPosition(event.latLng);
+        updateAddress('pickupaddress', event.latLng);
+    });
+
+    // Initialize Delivery Map
+    deliveryMap = new google.maps.Map(document.getElementById('deliveryMap'), {
+        center: { lat: 7.4472, lng: 125.8094 }, // Tagum City
+        zoom: 12,
+    });
+
+    deliveryMarker = new google.maps.Marker({
+        map: deliveryMap,
+        draggable: true,
+        position: { lat: 7.4472, lng: 125.8094 },
+    });
+
+    google.maps.event.addListener(deliveryMap, 'click', (event) => {
+        deliveryMarker.setPosition(event.latLng);
+        updateAddress('deliveryaddress', event.latLng);
+    });
+
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('viewPickupMap').addEventListener('click', () => {
         const modal = new bootstrap.Modal(document.getElementById('pickupMapModal'));
@@ -306,7 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     pickupModal.addEventListener('hide.bs.modal', function() {
         console.log("Pickup modal closed");
-        setActiveModal('');
+        setActiveModal('');        
+        resetMap(); // Reset the map when the modal is closed
     });
 
     // Event listener for Delivery Modal
@@ -317,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     deliveryModal.addEventListener('hide.bs.modal', function() {
         console.log("Delivery modal closed");
-        setActiveModal('');
+        setActiveModal('');        
+        resetMap(); // Reset the map when the modal is closed
     });
 });
