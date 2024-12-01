@@ -137,6 +137,11 @@ function CreateOrder() {
 
     console.log(data);
 
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'), {
+        keyboard: false
+    });
+    loadingModal.show();
+
     fetch('https://api.shipday.com/orders', {
         method: 'POST',
         headers: headers,
@@ -149,6 +154,7 @@ function CreateOrder() {
             return response.json();
         })
         .then(responseData => {
+            loadingModal.hide();
             console.log('Success:', responseData);
             document.getElementById("order-no").innerText = GorderNumber;
             var myModal = new bootstrap.Modal(document.getElementById('exampleModalCenter'), {
