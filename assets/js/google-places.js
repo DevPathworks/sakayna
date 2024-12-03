@@ -10,18 +10,18 @@ let deliveryAddress = '';
 let deliveryLatitude = '';
 let deliveryLongitude = '';
 
+const pickupSelectedPlaceDiv = document.getElementById('pickupSelectedPlace');
+const deliveirySelectedPlaceDiv = document.getElementById('deliverySelectedPlace');
+
+const pickUpinput = document.getElementById('pickupSearchInput');    
+const deliveryinput = document.getElementById('deliverySearchInput');  
+
 export const setActiveModal = function (modal) {
     activeModal = modal;
 }
 
 export const initAutocomplete = function (updateMapAndMarker) {
-    const pickUpinput = document.getElementById('pickupSearchInput');    
-    const deliveryinput = document.getElementById('deliverySearchInput');    
-
     let input = activeModal === 'pickupMapModal' ? pickUpinput : deliveryinput;
-
-    const pickupSelectedPlaceDiv = document.getElementById('pickupSelectedPlace');
-    const deliveirySelectedPlaceDiv = document.getElementById('deliverySelectedPlace');
 
     // Create the autocomplete object
     const autocomplete = new google.maps.places.Autocomplete(input, {
@@ -37,56 +37,62 @@ export const initAutocomplete = function (updateMapAndMarker) {
             window.alert("No details available for input: '" + place.name + "'");
             return;
         }
-
-        // Display selected place details
         const placeDetails = {
             name: place.name,
             address: place.formatted_address,
             latitude: place.geometry.location.lat(),
             longitude: place.geometry.location.lng()
         };
+        setPlaceDetails(placeDetails);
+        // Display selected place details
+        // const placeDetails = {
+        //     name: place.name,
+        //     address: place.formatted_address,
+        //     latitude: place.geometry.location.lat(),
+        //     longitude: place.geometry.location.lng()
+        // };
 
-        if (activeModal === 'pickupMapModal') {
-            pickupName = placeDetails.name;
-            pickupAddress = placeDetails.address;
-            pickupLatitude = placeDetails.latitude;
-            pickupLongitude = placeDetails.longitude;
+        // if (activeModal === 'pickupMapModal') {
+        //     pickupName = placeDetails.name;
+        //     pickupAddress = placeDetails.address;
+        //     pickupLatitude = placeDetails.latitude;
+        //     pickupLongitude = placeDetails.longitude;
 
-            // Show selected place details
-            pickupSelectedPlaceDiv.innerHTML = `
-            <div class="selected__place__container">
-                <h4>Selected Place:</h4>
-                <p><strong>Name:</strong> ${pickupName}</p>
-                <p><strong>Address:</strong> ${pickupAddress}</p>
-                <p><strong>Coordinates:</strong> ${pickupLatitude}, ${pickupLongitude}</p>
-                <div>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
-                </div>
-            </div>
-            `;
-            pickupSelectedPlaceDiv.style.display = 'block';
-        }
+        //     // Show selected place details
+        //     pickupSelectedPlaceDiv.innerHTML = `
+        //     <div class="selected__place__container">
+        //         <h4>Selected Place:</h4>
+        //         <p><strong>Name:</strong> ${pickupName}</p>
+        //         <p><strong>Address:</strong> ${pickupAddress}</p>
+        //         <p><strong>Coordinates:</strong> ${pickupLatitude}, ${pickupLongitude}</p>
+        //         <div>
+        //             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+        //         </div>
+        //     </div>
+        //     `;
+        //     pickupSelectedPlaceDiv.style.display = 'block';
+        // }
 
-        if (activeModal === 'deliveryMapModal') {
-            deliveryName = placeDetails.name;
-            deliveryAddress = placeDetails.address;
-            deliveryLatitude = placeDetails.latitude;
-            deliveryLongitude = placeDetails.longitude;
+        // if (activeModal === 'deliveryMapModal') {
+        //     deliveryName = placeDetails.name;
+        //     deliveryAddress = placeDetails.address;
+        //     deliveryLatitude = placeDetails.latitude;
+        //     deliveryLongitude = placeDetails.longitude;
 
-            // Show selected place details
-            deliveirySelectedPlaceDiv.innerHTML = `
-            <div class="selected__place__container">
-                <h4>Selected Place:</h4>
-                <p><strong>Name:</strong> ${deliveryName}</p>
-                <p><strong>Address:</strong> ${deliveryAddress}</p>
-                <p><strong>Coordinates:</strong> ${deliveryLatitude}, ${deliveryLongitude}</p>
-                <div>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
-                </div>
-            </div>
-            `;
-            deliveirySelectedPlaceDiv.style.display = 'block';
-        }    
+        //     // Show selected place details
+        //     deliveirySelectedPlaceDiv.innerHTML = `
+        //     <div class="selected__place__container">
+        //         <h4>Selected Place:</h4>
+        //         <p><strong>Name:</strong> ${deliveryName}</p>
+        //         <p><strong>Address:</strong> ${deliveryAddress}</p>
+        //         <p><strong>Coordinates:</strong> ${deliveryLatitude}, ${deliveryLongitude}</p>
+        //         <div>
+        //             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+        //         </div>
+        //     </div>
+        //     `;
+        //     deliveirySelectedPlaceDiv.style.display = 'block';
+        // }    
         
 
         const pickUpMapId = document.getElementById('pickupMap');
@@ -161,4 +167,62 @@ export const clearModalContents = function () {
     if (deliverySearchInput) {
         deliverySearchInput.value = '';
     }
+}
+
+export const setPlaceDetails = function (placeDetails) {
+     // Display selected place details
+    if (activeModal === 'pickupMapModal') {
+        pickupName = placeDetails.name;
+        pickupAddress = placeDetails.address;
+        pickupLatitude = placeDetails.latitude;
+        pickupLongitude = placeDetails.longitude;
+
+        // Show selected place details
+        pickupSelectedPlaceDiv.innerHTML = `
+        <div class="selected__place__container">
+            <h4>Selected Place:</h4>
+            <p><strong>Name:</strong> ${pickupName}</p>
+            <p><strong>Address:</strong> ${pickupAddress}</p>
+            <p><strong>Coordinates:</strong> ${pickupLatitude}, ${pickupLongitude}</p>
+            <div>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+            </div>
+        </div>
+        `;
+        pickupSelectedPlaceDiv.style.display = 'block';
+    }
+
+    if (activeModal === 'deliveryMapModal') {
+        deliveryName = placeDetails.name;
+        deliveryAddress = placeDetails.address;
+        deliveryLatitude = placeDetails.latitude;
+        deliveryLongitude = placeDetails.longitude;
+
+        // Show selected place details
+        deliveirySelectedPlaceDiv.innerHTML = `
+        <div class="selected__place__container">
+            <h4>Selected Place:</h4>
+            <p><strong>Name:</strong> ${deliveryName}</p>
+            <p><strong>Address:</strong> ${deliveryAddress}</p>
+            <p><strong>Coordinates:</strong> ${deliveryLatitude}, ${deliveryLongitude}</p>
+            <div>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="width:100%;font-size:20px;">Confirm</button>
+            </div>
+        </div>
+        `;
+        deliveirySelectedPlaceDiv.style.display = 'block';
+    }
+}
+
+export const getPlaceDetails = function (placeId) {
+    return new Promise((resolve, reject) => {
+        const service = new google.maps.places.PlacesService(document.createElement('div'));
+        service.getDetails({ placeId: placeId }, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                resolve(place);
+            } else {
+                reject(status);
+            }
+        });
+    });
 }

@@ -1,6 +1,6 @@
 import { caculateDistance } from './google-distance.js';
 import { getSheetData } from './google-sheet.js';
-import { initAutocomplete, setActiveModal, clearModalContents } from './google-places.js';
+import { initAutocomplete, setActiveModal, clearModalContents, setPlaceDetails, getPlaceDetails } from './google-places.js';
 
 let UserName = "";
 let PhoneNumber = "";
@@ -17,6 +17,9 @@ let pickupLongitude = '';
 let deliveryLatitude = '';
 let deliveryLongitude = '';
 
+const pickUpinput = document.getElementById('pickupSearchInput');    
+const deliveryinput = document.getElementById('deliverySearchInput');
+
 document.getElementById("name").addEventListener("input", function () {
     UserName = this.value;
 });
@@ -32,6 +35,7 @@ document.getElementById("email").addEventListener("input", function () {
 document.getElementById("pickupaddress").addEventListener("input", function () {
     PickUpAddress = this.value;
     this.disabled = false; // Ensure the field is enabled
+    console.log(PickUpAddress);
 });
 
 document.getElementById("deliveryaddress").addEventListener("input", function () {
@@ -69,12 +73,24 @@ function updateAddress(inputId, latLng) {
                 pickupLatitude = latLng.lat();
                 pickupLongitude = latLng.lng();
                 PickUpAddress = results[0].formatted_address;
+                pickUpinput.value = results[0].formatted_address;
             } else if (inputId === 'deliveryaddress') {
                 deliveryLatitude = latLng.lat();
                 deliveryLongitude = latLng.lng();
                 DeliveryAddress = results[0].formatted_address;
+                deliveryinput.value = results[0].formatted_address;
             }
 
+            const place = await getPlaceDetails(results[0].place_id);
+            const placeDetails = {
+                name: place.name, // This might not be the exact name, adjust as needed
+                address: results[0].formatted_address,
+                latitude: latLng.lat(),
+                longitude: latLng.lng()
+            };
+
+            setPlaceDetails(placeDetails);
+           
             console.log(`pickup-lat:  ${pickupLatitude}`);
             console.log(`pickup-lng:  ${pickupLongitude}`);
             console.log(`delv-lat:  ${deliveryLatitude}`);
