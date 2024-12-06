@@ -102,8 +102,7 @@
         </div>
 
         <!-- Order Confirmation Modal -->
-        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -111,10 +110,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Your order has been placed successfully! Your order number is: <span id="order-no"></span>
+                        <p>Your order has been placed successfully!</p>
+                        <p><strong>Order Number:</strong> <span id="order-no"></span></p>
+                        <p>We have notified our drivers. You will be updated once a driver accepts your order.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -177,8 +178,25 @@
                 </div>
             </div>
         </div>
-        <!-- Google Maps API -->
-        <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJiHQNcjxKtLV0FV6rKVKKwdRLIZicv1U&libraries=places&callback=initMap" async defer></script> -->
+        
+        <!-- New Modal -->
+        <div class="modal fade" tabindex="-1" id="noRiderModal" aria-labelledby="noRiderModalLabel" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="noRiderModalLabel">No Available Riders</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>We're sorry for the inconvenience, but there are no available riders at the moment. Please try again later.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             function loadGoogleMaps() {
                 const script = document.createElement('script');
