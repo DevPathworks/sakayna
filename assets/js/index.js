@@ -152,29 +152,27 @@ async function CreateOrder() {
         keyboard: false
     });
 
-    const newModal = new bootstrap.Modal(document.getElementById('newModal'), {
+    const noRiderModal = new bootstrap.Modal(document.getElementById('noRiderModal'), {
         keyboard: false
     });
 
     loadingModal.show();
 
-
     let result = await fetchCarriers();
 
-    if (!result.success) {
-        //show modal failed
+    if (result && result.length === 0) {
+        alert("ERROR: Shipday API is not available. Please try again later.");
+        loadingModal.hide();
+        return;
     }
 
     // Check if there are any drivers available
     const availableDrivers = result.filter(driver => driver.isOnShift);
     if (availableDrivers.length === 0) {
-        //replace with modal
         loadingModal.hide();
-        newModal.show();
+        noRiderModal.show();
         return;
     }
-
-    console.log(result);
 
     insertOrders(data)
         .then(result => {
