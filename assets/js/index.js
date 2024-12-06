@@ -152,7 +152,12 @@ async function CreateOrder() {
         keyboard: false
     });
 
+    const newModal = new bootstrap.Modal(document.getElementById('newModal'), {
+        keyboard: false
+    });
+
     loadingModal.show();
+
 
     let result = await fetchCarriers();
 
@@ -164,8 +169,8 @@ async function CreateOrder() {
     const availableDrivers = result.filter(driver => driver.isOnShift);
     if (availableDrivers.length === 0) {
         //replace with modal
-        alert("No drivers are currently available. Please try again later.");
         loadingModal.hide();
+        newModal.show();
         return;
     }
 
