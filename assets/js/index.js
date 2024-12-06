@@ -1,6 +1,7 @@
 import { caculateDistance } from './google-distance.js';
 import { getSheetData } from './google-sheet.js';
 import { initAutocomplete, setActiveModal, clearModalContents, setPlaceDetails, getPlaceDetails } from './google-places.js';
+import { insertOrders, fetchCarriers } from './shipday-api.js';
 
 let UserName = "";
 let PhoneNumber = "";
@@ -128,11 +129,7 @@ function displayDeliveryFee(fee) {
     document.getElementById('deliveryFee').innerText = `Delivery Fee: Php ${fee.toFixed(2)}`;
 }
 
-function CreateOrder() {
-    const headers = {
-        'Authorization': 'Basic wLUBnzrJHr.vqKT1iBdmTr1gedfKe8w',
-        'Content-Type': 'application/json'
-    };
+async function CreateOrder() {
 
     const data = {
         orderNumber: GorderNumber,
@@ -151,47 +148,64 @@ function CreateOrder() {
         deliveryFee: DeliveryFee
     };
 
-    console.log(data);
-
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'), {
         keyboard: false
     });
+
     loadingModal.show();
 
-    fetch('https://api.shipday.com/orders', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (!response.ok) {
+    let result = await fetchCarriers();
+
+    if (!result.success) {
+        //show modal failed
+    }
+
+    // Check if there are any drivers available
+    const availableDrivers = result.filter(driver => driver.isOnShift);
+    if (availableDrivers.length === 0) {
+        //replace with modal
+        alert("No drivers are currently available. Please try again later.");
+        loadingModal.hide();
+        return;
+    }
+
+    console.log(result);
+
+    insertOrders(data)
+        .then(result => {
+            if (!result.success) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
+            return result;
         })
         .then(responseData => {
             loadingModal.hide();
-            console.log('Success:', responseData);
-            document.getElementById("order-no").innerText = GorderNumber;
-            var myModal = new bootstrap.Modal(document.getElementById('exampleModalCenter'), {
-                keyboard: false
-            });
-            myModal.show();
-            document.getElementById("deliveryForm").reset();
-            GorderNumber = generateOrderNumber(); // Generate a new order number for the next order
-            UserName = "";
-            PhoneNumber = "";
-            Email = "";
-            PickUpAddress = "";
-            DeliveryAddress = "";
-            Other = "";
-            PickUpNumber = "";
-            clearModalContents();
-            document.getElementById('deliveryFee').innerText = `Delivery Fee: (Php: 0.00)`;
+            if(responseData) {
+                resetForm();
+            }
         })
         .catch(error => {
             console.error('Error:', error);
         });
+}
+
+function resetForm() {
+    document.getElementById("order-no").innerText = GorderNumber;
+    var myModal = new bootstrap.Modal(document.getElementById('exampleModalCenter'), {
+        keyboard: false
+    });
+    myModal.show();
+    document.getElementById("deliveryForm").reset();
+    GorderNumber = generateOrderNumber(); // Generate a new order number for the next order
+    UserName = "";
+    PhoneNumber = "";
+    Email = "";
+    PickUpAddress = "";
+    DeliveryAddress = "";
+    Other = "";
+    PickUpNumber = "";
+    clearModalContents();
+    document.getElementById('deliveryFee').innerText = `Delivery Fee: (Php: 0.00)`;
 }
 
 document.getElementById("submit").addEventListener("click", function (event) {
